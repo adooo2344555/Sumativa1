@@ -13,6 +13,7 @@ class ProductoController extends Controller
      */
     public function index()
     {
+        //hola
         try{
             return response()->json(Producto::with('categoria','imagenes')->get());
         }catch(\Exception $e){
