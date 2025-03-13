@@ -35,13 +35,13 @@ const destacados = ref([
 ]);
 
 const categorias = ref([]);
-const marcas = ref([]);
-const filtroCategoria = ref("");
-const filtroMarca = ref("");
-const searchQuery = ref("");
+/* const marcas = ref([]);
+ */const filtroCategoria = ref("");
+/* const filtroMarca = ref("");
+ */const searchQuery = ref("");
 const isOpen = ref(false);
 const urlBase = "http://localhost:8000/api/";
-const orden = ref({
+const reservacion = ref({
   id: null,
   fecha: new Date().toISOString().split("T")[0], //fomato yyyy-MM-dd
   estado: "R",
@@ -91,14 +91,14 @@ const fetchProductos = async () => {
 };
 //fin de las peticiones
 
-const agregarOrden = (producto, cantidad) => {
+const agregarReservacion = (producto, cantidad) => {
   if (!user) {
     Swal.fire("Debes estar autenticado para realizar una orden.");
     return;
   }
   //hacemos el proceso para llenar el detalle de la orden
   const nuevoProducto = { ...producto };
-  const existe = orden.value.detalleReservaciones.find(
+  const existe = reservacion.value.detalleReservaciones.find(
     (item) => item.producto.id === producto.id
   );
   if (existe) {
@@ -121,7 +121,6 @@ const agregarOrden = (producto, cantidad) => {
       icon: "success",
     });
   }
-  //orden.value.total = orden.value.detalleOrdenes.reduce((t,item) => t + item.subtotal,0)
   reservacion.value.total = totalReservacion;
 };
 
@@ -139,16 +138,16 @@ const confirmarReservacion = async () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const response = await axios.post(`${urlBase}ordenes`, reservacion.value);
+        const response = await axios.post(`${urlBase}reservaciones`, reservacion.value);
         //desestructuramos la respuesta del backend
         const { message, reservacion: nuevaReservacion } = response.data;
         Swal.fire({
           title: "¡Confirmar!",
-          text: `${message} con el número ${nuevaReservacion.correlativo}`,
+          text: `${message} con el número ${nuevaReservacion}`,
           icon: "success",
         });
         //seteamos el objeto orden
-        orden.value = {
+        reservacion.value = {
           id: null,
           fecha: new Date().toISOString().split("T")[0],
           estado: "R",
@@ -177,8 +176,8 @@ const filteredProducts = computed(() => {
 });
 
 //propiedad computable para calcular el total de la orden
-const totalOrden = computed(() => {
-  return orden.value.detalleReservaciones.reduce(
+const totalReservacion = computed(() => {
+  return reservacion.value.detalleReservaciones.reduce(
     (total, item) => total + item.producto.precio * item.cantidad,
     0
   );
@@ -186,7 +185,7 @@ const totalOrden = computed(() => {
 
 //funcion para eliminar un producto de la orden
 const deleteItem = (item) => {
-  const index = orden.value.detalleReservaciones.indexOf(item);
+  const index = reservacion.value.detalleReservaciones.indexOf(item);
   reservacion.value.detalleReservaciones.splice(index, 1);
 };
 </script>
@@ -284,11 +283,6 @@ const deleteItem = (item) => {
           <option value="">Categoría</option>
           <option v-for="cat in categorias" :key="cat">{{ cat.nombre }}</option>
         </select>
-        <select
-          v-model="filtroCategoria"
-          class="border p-2 rounded w-full md:w-auto"
-        >
-        </select>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -343,9 +337,9 @@ const deleteItem = (item) => {
         </button>
       </div>
     </div>
-    <!--Div para mostrar el datella de la orden-->
+    <!--Div para mostrar el datelle de la reservacion-->
     <div
-      v-if="orden.detalleReservaciones?.length > 0"
+      v-if="reservacion.detalleReservaciones?.length > 0"
       class="mt-6 p-6 bg-white rounded-lg shadow-lg"
     >
       <h2 class="text-2xl font-semibold mb-4 text-gray-700">
@@ -356,7 +350,7 @@ const deleteItem = (item) => {
           <thead class="bg-gray-200 text-gray-700">
             <tr>
               <th class="px-4 py-2 text-left">Producto</th>
-              <th class="px-4 py-2 text-left">Marca</th>
+              <th class="px-4 py-2 text-left">categoria</th>
               <th class="px-4 py-2 text-right">Precio</th>
               <th class="px-4 py-2 text-right">Cantidad</th>
               <th class="px-4 py-2 text-right">Total</th>
@@ -365,7 +359,7 @@ const deleteItem = (item) => {
           </thead>
           <tbody>
             <tr
-              v-for="item in orden.detalleReservaciones"
+              v-for="item in reservacion.detalleReservaciones"
               :key="item.id"
               class="border-b"
             >
@@ -397,7 +391,7 @@ const deleteItem = (item) => {
               <td></td>
               <td coldspan="6" class="px-4 py-3 text-right">Total</td>
               <td class="px-4 py-3 text-right text-bold text-blue-600">
-                ${{ (totalOrden ?? 0).toFixed(2) }}
+                ${{ (totalReservacion ?? 0).toFixed(2) }}
               </td>
               <td></td>
             </tr>
@@ -406,7 +400,7 @@ const deleteItem = (item) => {
       </div>
       <div class="mt-4 text-right">
         <button
-          @click="confirmarReservaciones"
+          @click="confirmarReservacion"
           class="px-6 py-3 bg-green-700 hover:bg-green-900 text-white rounded font-semibold"
         >
           Confirmar Reservacion

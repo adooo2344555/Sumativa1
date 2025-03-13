@@ -73,12 +73,12 @@ const logout = async () => {
                         Inicio
                     </a>
                 </li>
-               <!--  <li class="px-6 py-3 hover:bg-blue-500 flex items-center">
-                    <a :href="route('marcas')" class="flex items-center w-full">
+                 <li class="px-6 py-3 hover:bg-blue-500 flex items-center">
+                    <a :href="route('categorias')" class="flex items-center w-full">
                         <FontAwesomeIcon :icon="faLayerGroup" class="mr-3"/>
-                        Catalogos
+                        Categorias
                     </a>
-                </li> -->
+                </li> 
                 <li class="px-6 py-3 hover:bg-blue-500 flex items-center">
                     <Link :href="route('productos')" class="flex items-center w-full">
                         <FontAwesomeIcon :icon="faBox" class="mr-3"/>
