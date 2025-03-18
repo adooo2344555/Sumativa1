@@ -46,4 +46,9 @@ Route::get('/categorias', function(){
     return Inertia::render('catalogos/Categorias');
 })->middleware(['auth', 'verified'])->name('categorias');
 
+//rutas para acceder ala de productos
+Route::get('/reservaciones', function(){
+    return Inertia::render('reservaciones/Reservaciones');
+})->middleware(['auth', 'verified'])->name('reservaciones');
+
 require __DIR__.'/auth.php';

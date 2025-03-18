@@ -18,7 +18,7 @@ class ReservacionController extends Controller
     public function index()
     {
         try {
-            return response()->json(Reservacion::with('user', 'detalleReservaciones.producto')->get());
+            return response()->json(Reservacion::with('user', 'detalleReservaciones.producto.categoria')->get());
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -123,7 +123,7 @@ class ReservacionController extends Controller
                 ], 404);
             }
             //definimos estados de la orden
-            $estados = ['C' => 'Confirmada', 'P' => 'Pendiente', 'Ca' => 'Cancelada'];
+            $estados = ['C' => 'Confirmada', 'P' => 'Pendiente', 'A' => 'Cancelada'];
             //verificamos el estado de envio
             if (!array_key_exists($request->estado, $estados)) {
                 return response()->json([
