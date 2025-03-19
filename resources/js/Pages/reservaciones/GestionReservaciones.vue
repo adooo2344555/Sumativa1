@@ -168,7 +168,7 @@ onMounted(fetchReservaciones);
                         </DataTable>
                     </div>
 
-                    <!-- Modal para mostrar detalles de la orden -->
+                    <!-- Modal para mostrar detalles de la reservacion -->
                     <Dialog v-model:visible="showDetailsDialog" class="p-fluid" :style="{ width: '650px' }" header="Detalle de Reservacion" :modal="true">
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-4 text-sm font-medium text-gray-700">
@@ -188,7 +188,7 @@ onMounted(fetchReservaciones);
                                 </div>
                                 <div class="inline-flex items-center">
                                     <span class="block text-gray-500">Estado: </span>
-                                    <span class="font-semibold">{{ reservacion?.estado === 'C' ? 'Completada' : reservacion?.estado === 'P' ? 'Pendiente' : 'Cancelada' }}</span>
+                                    <span class="font-semibold">{{ reservacion?.estado === 'P' ? 'Pendiente' : reservacion?.estado === 'C' ? 'Confirmada' : 'Cancelada' }}</span>
                                 </div>
                             </div>
                             <div class="overflow-x-auto">
@@ -209,7 +209,7 @@ onMounted(fetchReservaciones);
                                             <td class="px-4 py-2">{{ item.producto.nombre }}, {{ item.producto.descripcion }}, modelo: {{ item.producto.modelo }}</td>
                                         </tr>
                                         <tr class="bg-gray-200 font-semibold">
-                                            <td colspan="3" class="px-4 py-2 text-right">Total de la Orden</td>
+                                            <td colspan="3" class="px-4 py-2 text-right">Total de la Reservacion</td>
                                             <td class="px-4 py-2 text-center text-lg">${{ reservacion?.total }}</td>
                                         </tr>
                                     </tbody>

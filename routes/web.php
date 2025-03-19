@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -48,7 +49,13 @@ Route::get('/categorias', function(){
 
 //rutas para acceder ala de productos
 Route::get('/reservaciones', function(){
-    return Inertia::render('reservaciones/Reservaciones');
+    return Inertia::render('reservaciones/GestionReservaciones');
 })->middleware(['auth', 'verified'])->name('reservaciones');
+
+Route::get('/reportes/reservaciones/rango', function () {
+    return Inertia::render('reportes/ReportesReservaciones');
+})->middleware(['auth', 'verified'])->name('reservaciones.rango');
+
+Route::get('/reportes/reservaciones', [PDFController::class,'getReservaciones'])->name('reportes.reservaciones');
 
 require __DIR__.'/auth.php';
