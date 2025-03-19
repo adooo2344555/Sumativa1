@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Imagen;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+
 
 class ProductoController extends Controller
 {
@@ -13,7 +15,6 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        //hola
         try{
             return response()->json(Producto::with('categoria','imagenes')->get());
         }catch(\Exception $e){
@@ -111,69 +112,59 @@ class ProductoController extends Controller
     public function update(Request $request, Producto $producto)
     {
         try {
-            // Validación de los datos
-            $request->validate([
-                "nombre" => "required|string",
-                "descripcion" => "required|string",
-                "precio" => "required|numeric",
-                "material" => "required|string",
-                "categoria.id" => "required|integer|exists:categorias,id"
-            ]);
-    
-            // Obtención de datos correctamente
-            $productoRequest = $request->all();
-    
-            // Verificar si ya existe un producto con esos datos (excluyendo el actual)
-            $record = Producto::where("nombre", $productoRequest["nombre"])
-                ->where("descripcion", $productoRequest["descripcion"])
-                ->where("id", "!=", $producto->id)
-                ->where("categoria_id", $productoRequest["categoria"]["id"])
-                ->first();
-    
-            if ($record) {
-                return response()->json(["message" => "Ya existe un producto con estos datos"], 409);
+            // Verificar si ya existe un producto con el mismo nombre y diferente ID
+            $existeProducto = Producto::where("nombre", $request->nombre)->where("id", "!=", $producto->id)->first();
+            if ($existeProducto) {
+                return response()->json(["message" => "Ya existe un producto con este nombre"], 409);
             }
-    
-            // Actualización del producto
+        
+            // Actualizar el producto con los nuevos datos
             $producto->update([
-                "nombre" => $productoRequest["nombre"],
-                "descripcion" => $productoRequest["descripcion"],
-                "precio" => $productoRequest["precio"],
-                "material" => $productoRequest["material"],
-                "categoria_id" => $productoRequest["categoria"]["id"]
+                'nombre' => $request->nombre,
+                'descripcion' => $request->descripcion,
+                'precio' => $request->precio,
+                'material' => $request->material,
+                'categoria_id' => $request->categoria, 
             ]);
-    
-            // Manejo de imágenes (si las hay)
-            if ($request->hasFile('imagenes')) {
-                // Eliminar imágenes antiguas
+        
+            // Eliminar imágenes existentes
+            if ($producto->imagenes) {
                 foreach ($producto->imagenes as $image) {
-                    $imagePath = public_path('images/products/') . $image->nombre;
+                    $imagePath = public_path('images/products/' . $image->nombre);
                     if (file_exists($imagePath)) {
-                        unlink($imagePath);
+                        unlink($imagePath); // Eliminar archivo físico
                     }
-                    $image->delete();
-                }
-    
-                // Guardar nuevas imágenes
-                foreach ($request->file('imagenes') as $img) {
-                    $imageName = time() . '_' . $img->getClientOriginalName();
-                    $img->move(public_path('images/products/'), $imageName);
-                    Imagen::create([
-                        'nombre' => $imageName,
-                        'producto_id' => $producto->id
-                    ]);
+                    $image->delete(); // Eliminar registro en la base de datos
                 }
             }
-    
-            return response()->json([
-                "producto" => $this->show($producto->id),
-                "message" => "Producto actualizado con éxito...!"
-            ], 200);
-    
+        
+            // Agregar nuevas imágenes si están presentes en la solicitud
+            if($request->hasFile('imagenes')){
+                //recorremos la colección de imagenes para guardarlas en "imagenes"
+                foreach($request->file('imagenes') as $img){
+                    //creamos un nombre único de la imagen
+                    $imageName = time() . '_' . $img->getClientOriginalName();
+                    //subimos el archivo de imagen a una carpeta publica del servidor
+                    $img->move(public_path('images/products/'),$imageName);
+                    //creamos la instancia de Imagen para luego guardar cada registro en 
+                    //la tabla de imagenes
+                    $image = new Imagen();
+                    $image->nombre = $imageName;
+                    $image->producto_id = $producto->id;
+                    $image->save();
+                }
+            }
+            // Obtener el producto actualizado con sus relaciones
+            $prodPersisted = Producto::with([ 'categoria', 'imagenes'])->findOrFail($producto->id);
+        
+            return response()->json(['producto' => $prodPersisted, 'message' => 'Producto actualizado correctamente'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -184,22 +175,24 @@ class ProductoController extends Controller
             $producto = Producto::findOrFail($id);
             /* Eliminamos las imágenes del servidor y en las carpetas 
             de nuestra lap ala hora de eliminar el registro */
-
             foreach($producto->imagenes as $image){
                 $imagePath = public_path() . '/images/products/' . $image->nombre;
                 unlink( $imagePath);
             }
-
             // Eliminamos los registros de la tabla de imágenes
              $producto->imagenes()->delete();
-
             if($producto->delete() > 0){
                 return response()->json(["message" => "Producto eliminado"],205);
-             }else{
-                return response()->json(["message" => "Ocurrió un error al eliminar el producto"],409);
             }
-         }catch(\Exception $e) {
-            return response()->json(['error'=>$e->getMessage()],500);
-         }
+        } catch(QueryException $e) {
+            if($e->getCode() == "23000") {
+                return response()->json([
+                    'error' => 'No se puede eliminar este producto, porque tiene registros relacionados'], 409);
+            }
+            return response()->json(['error' => 'Error en la base de datos: ' . $e->getMessage()], 500);
+        }
+         catch(\Exception $e) {
+            return response()->json(['error' => 'Error inesperado: ' . $e->getMessage()], 500);
+        }
     }
 }

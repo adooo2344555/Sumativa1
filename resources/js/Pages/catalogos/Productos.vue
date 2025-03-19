@@ -83,79 +83,91 @@ const fetchCategorias = async () => {
 
 const saveOrUpdate = async () => {
     submitted.value = true;
-
     if (producto?.value.nombre?.trim()) {
-        const formData = new FormData();
-        formData.append('producto', JSON.stringify(producto.value)); // Convertimos el producto a JSON
-        // Agregar las imágenes al formData
-        imagenes.value.forEach((img) => {
-            formData.append("imagenes[]", img);
-        });
-
         if (producto.value.id) {
-            // Se va actualizar el producto
-            try {
-                const response = await axios.post(`${url}/${producto.value.id}`, formData, {
-                    headers: { "Content-Type": "multipart/form-data" }
-                });
-                if (response.status === 200) {
-                    const { producto: nuevoProducto, message } = response.data;
-                    // Actualizamos el dato en el arreglo
-                    const index = productos.value.findIndex(m => m.id === nuevoProducto.id);
-                    if (index !== -1) {
-                        productos.value[index] = nuevoProducto;
+            // Actualizar producto
+            const formData = new FormData();
+
+            
+            // Agregar los datos del producto al FormData
+            for (const [key, value] of Object.entries(producto.value)) {
+                if (value !== null && value !== undefined) {
+                    // Si la clave es 'categoria', envía solo el ID
+                    if (( key === 'categoria') && value && value.id) {
+                        formData.append(key, value.id); // Envía solo el ID
+                    } else {
+                        formData.append(key, value); // Envía otros campos normalmente
                     }
-                    toast.add({ severity: 'success', summary: 'Successful', detail: message, life: 3000 });
-                    dialog.value = false;
-                    producto.value = {};
-                    imagenes.value = [];
                 }
-            } catch (err) {
-                if (err.response.status === 409) {
-                    toast.add({
-                        severity: 'warn', summary: 'Advertencia',
-                        detail: `${err.response.data.message}, Ya existe este producto`, life: 3000
-                    });
-                }
-                console.error(err);
             }
-        } else {
-            // Se va agregar un nuevo producto
+
+            // Agregar imágenes al FormData
+            imagenes.value.forEach((imagen) => {
+                formData.append("imagenes[]", imagen);
+            });
+
+            // Verificar los datos que se están enviando
+            console.log([...formData.entries()]);
+
             try {
-                const response = await axios.post(url, formData, {
-                    headers: { "Content-Type": "multipart/form-data" }
+                const response = await axios.post(`${url}/${producto.value.id}?_method=PUT`, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
                 });
-                if (response.status === 201) {
-                    const { producto: nuevoProducto, message } = response.data;
-                    productos.value.unshift(nuevoProducto.original);
-                    toast.add({
-                        severity: 'success', summary: 'Registrado',
-                        detail: message, life: 3000
-                    });
-                    dialog.value = false;
-                    producto.value = {};
-                    imagenes.value = [];
+
+                if (response.status === 200) {
+                    const { producto: updatedProducto, message } = response.data;
+                    const index = findIndexById(updatedProducto.id);
+                    if (index !== -1) {
+                        // Actualizar de manera reactiva
+                        productos.value.splice(index, 1, updatedProducto);
+                    }
+                    toast.add({ severity: 'success', summary: 'Actualizado!', detail: message, life: 3000 });
                 }
+                dialog.value = false;
             } catch (err) {
                 if (err.response && err.response.status === 409) {
-                    const message = err.response.data;
-                    toast.add({
-                        severity: 'warn', summary: 'Advertencia',
-                        detail: message, life: 3000
-                    });
-                } else if (err.response && err.response.status === 500) {
+                    toast.add({ severity: 'warn', summary: 'Conflicto!', detail: err.response.data.message, life: 3000 });
+                } else if (err.response && err.response.status == 500) {
                     const { error } = err.response.data;
-                    toast.add({
-                        severity: 'error', summary: 'Error',
-                        detail: error, life: 3000
-                    });
+                    toast.add({ severity: 'error', summary: 'Error!', detail: error, life: 3000 });
                 } else {
-                    console.error(err);
+                    console.log('Error inesperado', err);
+                }
+            }
+        } else {
+            // Agregar producto
+            try {
+                const formData = new FormData();
+                formData.append('producto', JSON.stringify(producto.value));
+                // Agregamos las imágenes al formData
+                imagenes.value.forEach((imagen) => {
+                    formData.append("imagenes[]", imagen);
+                });
+                const response = await axios.post(url, formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+                if (response.status === 201) {
+                    const { producto: nuevoProducto, message } = response.data;
+                    // Agregar el nuevo producto de manera reactiva
+                    productos.value.unshift(nuevoProducto.original);
+                    toast.add({ severity: 'success', summary: 'Registrado!', detail: message, life: 3000 });
+                }
+                dialog.value = false;
+                producto.value = {};
+            } catch (err) {
+                if (err.response && err.response.status === 409) {
+                    toast.add({ severity: 'warn', summary: 'Conflicto!', detail: err.response.data.message, life: 3000 });
+                } else if (err.response && err.response.status == 500) {
+                    const { error } = err.response.data;
+                    toast.add({ severity: 'error', summary: 'Error!', detail: error, life: 3000 });
+                } else {
+                    console.log('Error inesperado', err);
                 }
             }
         }
     }
 };
+
 
 
 
@@ -182,7 +194,7 @@ const deleteProduct = async () => {
         if(response.status===205){
             const { message } = response.data;
             productos.value = productos.value.filter(val => val.id !== producto.value.id);
-            toast.add({ severity: 'success', summary: 'Producto eliminado', detail: message , life: 3000 });
+            toast.add({ severity: 'Success', summary: 'Producto eliminado', detail: message , life: 3000 });
 
         }
     } catch (err) {
@@ -327,7 +339,7 @@ const btnTitle = computed(() => (producto.value.id ? "Actualizar" : "Guardar"));
 
                             <Column field="precio" header="Precio" sortable style="min-width: 8rem">
                                 <template #body="slotProps">
-                                    {{ formatCurrency(slotProps.data.precio) }}
+                                    ${{ formatCurrency(slotProps.data.precio) }}
                                 </template>
                             </Column>
                             <Column field="material" header="Material" sortable style="min-width: 16rem"></Column>
