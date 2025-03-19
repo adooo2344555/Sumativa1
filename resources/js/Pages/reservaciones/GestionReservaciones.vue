@@ -81,7 +81,7 @@ const changeReservacion = async (reservacion, nuevoEstado) => {
                 toast.add({
                     severity: 'success',
                     summary: 'Éxito',
-                    detail: `Orden ${estadoTexto} correctamente`,
+                    detail: `Reservacion ${estadoTexto} correctamente`,
                     life: 3000
                 });
             }
