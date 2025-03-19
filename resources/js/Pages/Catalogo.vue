@@ -110,7 +110,7 @@ const agregarReservacion = (producto, cantidad) => {
 const confirmarReservacion = async () => {
   Swal.fire({
     title: "¿Estás seguro(a)?",
-    text: "Deseas confirmar la reservacion, después no se podrá revertir",
+    text: "Deseas confirmar la reservación, después no se podrá revertir",
     icon: "question",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
@@ -124,14 +124,14 @@ const confirmarReservacion = async () => {
         const { message, reservacion: nuevaReservacion } = response.data;
         const fechaFormateada = new Date(nuevaReservacion.fecha).toLocaleDateString();
         Swal.fire({
-          title: "¡Confirmar!",
+          title: "¡Reservación Exitosamente!",
           text: `${message} con el número ${nuevaReservacion.id} para el ${fechaFormateada}`,
           icon: "success",
         });
         reservacion.value = {
           id: null,
           fecha: new Date().toISOString().split("T")[0],
-          estado: "R",
+          estado: "P",
           user: user,
           detalleReservaciones: [],
         };
@@ -262,7 +262,7 @@ const cerrarModal = () => {
 
     <div v-if="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2 p-6 max-h-[80vh] overflow-y-auto">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Resumen de la Reservacion</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Resumen de la Reservación</h2>
         <div class="mt-4">
           <label for="fechaReservacion" class="block text-sm font-medium text-gray-700">Fecha de Reservación</label>
           <input type="date" id="fechaReservacion" v-model="reservacion.fecha" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
