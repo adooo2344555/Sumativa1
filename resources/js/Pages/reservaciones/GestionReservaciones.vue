@@ -97,9 +97,6 @@ const changeReservacion = async (reservacion, nuevoEstado) => {
     }
 };
 
-const formatCurrency = (value) => {
-    return value ? value.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '';
-};
 
 onMounted(fetchReservaciones);
 </script>
@@ -146,11 +143,7 @@ onMounted(fetchReservaciones);
                             <Column field="id" header="Reservacion No" sortable></Column>
                             <Column field="fecha" header="Fecha Reservacion"></Column>
                             <Column field="fecha_despacho" header="Fecha Despacho"></Column>
-                            <Column field="monto" header="Total Reservacion">
-                                <template #body="{ data }">
-                                    {{ formatCurrency(data.total) }}
-                                </template>
-                            </Column>
+
                             <Column field="user.name" header="Cliente"></Column>
                             <Column :exportable="false">
                                 <template #body="{ data }">
@@ -177,7 +170,7 @@ onMounted(fetchReservaciones);
                                     <span class="font-semibold">{{ reservacion?.id }}</span>
                                 </div>
                                 <div class="inline-flex items-center">
-                                    <span class="block text-gray-500">Fecha Reservación: </span>
+                                    <span class="block text-gray-500">Fecha Orden: </span>
                                     <span class="font-semibold">{{ reservacion?.fecha }}</span>
                                 </div>
                             </div>
@@ -206,7 +199,7 @@ onMounted(fetchReservaciones);
                                             <td class="px-4 py-2 text-center">{{ item.cantidad }}</td>
                                             <td class="px-4 py-2 text-center font-semibold">${{ item.subtotal }}</td>
                                             <td class="px-4 py-2">{{ reservacion?.id }}</td>
-                                            <td class="px-4 py-2">{{ item.producto.nombre }}, {{ item.producto.descripcion }}, modelo: {{ item.producto.modelo }}</td>
+                                            <td class="px-4 py-2">{{ item.producto.nombre }}, {{ item.producto.descripcion }}, material: {{ item.producto.material }}</td>
                                         </tr>
                                         <tr class="bg-gray-200 font-semibold">
                                             <td colspan="3" class="px-4 py-2 text-right">Total de la Reservacion</td>
