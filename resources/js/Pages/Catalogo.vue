@@ -1,4 +1,4 @@
-<<script setup>
+<script setup>
 import { computed, onMounted, ref } from "vue";
 import { usePage, Link } from "@inertiajs/vue3";
 import { Swiper, SwiperSlide } from "swiper/vue";
@@ -77,7 +77,7 @@ const fetchProductos = async () => {
 
 const agregarReservacion = (producto, cantidad) => {
   if (!user) {
-    Swal.fire("Debes estar autenticado para realizar una orden.");
+    Swal.fire("Debes estar autenticado para realizar una reservación.");
     return;
   }
   const nuevoProducto = { ...producto };
@@ -186,7 +186,7 @@ const cerrarModal = () => {
 </script>
 
 <template>
-  <div class="container mx-auto p-6">
+  <div class="container mx-auto p-6 bg-white text-gray-800">
     <nav class="fixed top-0 left-0 w-full bg-yellow-500 text-white shadow-md z-50">
       <div class="container mx-auto flex flex-wrap justify-between items-center p-4">
         <h1 class="text-xl font-bold">Joyeria Aurum</h1>
@@ -217,7 +217,7 @@ const cerrarModal = () => {
     <div class="pt-8">
       <Swiper :modules="[Navigation, Autoplay]" navigation :autoplay="{ delay: 3000, disableOnInteraction: false }" :speed="1000" loop class="my-6">
         <SwiperSlide v-for="destacado in destacados" :key="destacado.id" class="p-4">
-          <div class="bg-white-10 text-white rounded-lg overflow-hidden shadow-lg">
+          <div class="bg-white text-black rounded-lg overflow-hidden shadow-lg">
             <img :src="destacado.imagen" class="w-full h-96 object-cover object-center" />
             <div class="p-4">
               <h2 class="text-xl font-semibold">{{ destacado.nombre }}</h2>
@@ -244,7 +244,7 @@ const cerrarModal = () => {
   </Swiper>
   <div class="p-4">
     <h2 class="text-xl font-semibold">{{ producto.nombre }}</h2>
-    <span class="text-sm text-blue-600">
+    <span class="text-sm text-gray-800">
       {{ producto.descripcion }}
       <br />
       <strong>Material:</strong> {{ producto.material }}
@@ -252,7 +252,7 @@ const cerrarModal = () => {
     <p class="text-yellow-500 text-lg font-bold">${{ producto.precio }}</p>
     <div class="flex flex-col md:flex-row md:space-x-4">
       <input type="number" min="1" :value="cantidades[producto.id] || 1" @input="cantidades[producto.id] = Number($event.target.value)" class="border p-2 rounded w-full my-2 md:w-auto md:my-0" />
-      <button @click="agregarReservacion(producto, cantidades[producto.id] || 1)" class="bg-yellow-500 text-white px-4 py-2 rounded w-full md:w-auto">Agregar Reservacion</button>
+      <button @click="agregarReservacion(producto, cantidades[producto.id] || 1)" class="bg-yellow-500 text-white px-4 py-2 rounded w-full md:w-auto">Agregar al Carrito</button>
     </div>
   </div>
 </div>
