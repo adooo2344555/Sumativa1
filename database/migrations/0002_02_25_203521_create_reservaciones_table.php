@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('reservaciones', function (Blueprint $table) {
             $table->id();
-            $table->datetime('fecha');
+            $table->date('fecha');
             $table->string('estado',1)->default('P');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
-
         });
     }
 

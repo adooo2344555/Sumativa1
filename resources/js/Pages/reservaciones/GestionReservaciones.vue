@@ -106,7 +106,7 @@ onMounted(fetchReservaciones);
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+            <h2 class="text-xl font-semibold leading-tight text-yellow-800">
                 Dashboard
             </h2>
         </template>
@@ -163,8 +163,8 @@ onMounted(fetchReservaciones);
 
                     <!-- Modal para mostrar detalles de la reservacion -->
                     <Dialog v-model:visible="showDetailsDialog" class="p-fluid" :style="{ width: '650px' }" header="Detalle de Reservacion" :modal="true">
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4 text-sm font-medium text-gray-700">
+                        <div class="space-y-4 ">
+                            <div class="grid grid-cols-2 gap-4 text-sm font-medium text-white">
                                 <div class="inline-flex items-center">
                                     <span class="block text-gray-500">Reservacion: </span>
                                     <span class="font-semibold">{{ reservacion?.id }}</span>
@@ -174,7 +174,7 @@ onMounted(fetchReservaciones);
                                     <span class="font-semibold">{{ reservacion?.fecha }}</span>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 text-sm font-medium text-gray-700">
+                            <div class="grid grid-cols-2 gap-4 text-sm font-medium text-white">
                                 <div class="inline-flex items-center">
                                     <span class="block text-gray-500">Cliente: </span>
                                     <span class="font-semibold">{{ reservacion?.user?.name }}</span>
@@ -194,7 +194,7 @@ onMounted(fetchReservaciones);
                                             <th class="px-4 py-2">Producto</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
+                                    <tbody class="bg-white divide-y divide-gray-200  text-black">
                                         <tr v-for="item in reservacion?.detalle_reservaciones" :key="item.id" class="hover:bg-gray-100">
                                             <td class="px-4 py-2 text-center">{{ item.cantidad }}</td>
                                             <td class="px-4 py-2 text-center font-semibold">${{ item.subtotal }}</td>
