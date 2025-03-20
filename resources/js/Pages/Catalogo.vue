@@ -27,7 +27,7 @@ const destacados = ref([
     id: 2,
     nombre: "Pulseras",
     precio: 400,
-    imagen: "/images/slider/pulseras.jpg",
+    imagen: "/images/slider/pulseras.webp",
   },
   {
     id: 3,
