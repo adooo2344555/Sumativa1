@@ -77,7 +77,7 @@ const fetchProductos = async () => {
 
 const agregarReservacion = (producto, cantidad) => {
   if (!user) {
-    Swal.fire("Debes estar autenticado para realizar una orden.");
+    Swal.fire("Debes estar autenticado para realizar una reservación.");
     return;
   }
   const nuevoProducto = { ...producto };
@@ -252,7 +252,7 @@ const cerrarModal = () => {
     <p class="text-yellow-500 text-lg font-bold">${{ producto.precio }}</p>
     <div class="flex flex-col md:flex-row md:space-x-4">
       <input type="number" min="1" :value="cantidades[producto.id] || 1" @input="cantidades[producto.id] = Number($event.target.value)" class="border p-2 rounded w-full my-2 md:w-auto md:my-0" />
-      <button @click="agregarReservacion(producto, cantidades[producto.id] || 1)" class="bg-yellow-500 text-white px-4 py-2 rounded w-full md:w-auto">Agregar Reservacion</button>
+      <button @click="agregarReservacion(producto, cantidades[producto.id] || 1)" class="bg-yellow-500 text-white px-4 py-2 rounded w-full md:w-auto">Agregar al Carrito</button>
     </div>
   </div>
 </div>
